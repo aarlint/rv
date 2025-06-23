@@ -27,7 +27,7 @@ import './App.css';
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const [theme, setTheme] = useState('system');
+  const [theme, setTheme] = useState('dark');
 
   const navItems = useMemo(() => [
     { id: 'rv-overview', label: 'RV Overview', icon: <FaHome /> },
@@ -61,38 +61,6 @@ function App() {
     window.print();
   };
 
-  const downloadChecklist = (type) => {
-    const checklists = {
-      arrival: `
-        Arrival Checklist:
-        1. Park on level ground and engage parking brake
-        2. Chock the wheels for safety
-        3. Connect to 30amp power source (if available)
-        4. Open propane tank valve
-        5. Check all systems are functioning
-      `,
-      departure: `
-        Drop-off Checklist:
-        1. Empty and clean all waste tanks (black tank may read 3/4 full but be empty)
-        2. Clean interior thoroughly
-        3. Remove all personal belongings
-        4. Turn off all appliances and lights, including water pump
-        5. Close all windows and vents
-        6. Secure all loose items and collapse the table
-        7. Return to original parking location (if applicable)
-        8. Complete final inspection
-      `
-    };
-    
-    const blob = new Blob([checklists[type]], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${type}-checklist.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       const sections = navItems.map(item => item.id);
@@ -114,8 +82,8 @@ function App() {
   }, [navItems]);
 
   useEffect(() => {
-    // Check for saved theme preference or default to system
-    const savedTheme = localStorage.getItem('theme') || 'system';
+    // Check for saved theme preference or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     setTheme(savedTheme);
     
     // Apply theme
@@ -146,19 +114,15 @@ function App() {
   };
 
   const toggleTheme = () => {
-    const themes = ['light', 'dark', 'system'];
-    const currentIndex = themes.indexOf(theme);
-    const nextTheme = themes[(currentIndex + 1) % themes.length];
+    // Simple toggle between light and dark
+    const newTheme = theme === 'light' ? 'dark' : 'light';
     
-    setTheme(nextTheme);
-    localStorage.setItem('theme', nextTheme);
-    applyTheme(nextTheme);
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
   };
 
   const getThemeIcon = () => {
-    if (theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? <FaMoon /> : <FaSun />;
-    }
     return theme === 'dark' ? <FaSun /> : <FaMoon />;
   };
 
@@ -175,7 +139,7 @@ function App() {
             <button 
               className="theme-toggle"
               onClick={toggleTheme}
-              aria-label={`Switch to ${theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark'} theme`}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
               title={`Current: ${theme} theme`}
             >
               {getThemeIcon()}
@@ -419,9 +383,6 @@ function App() {
                   <li>Open propane tank valve</li>
                   <li>Check all systems are functioning</li>
                 </ol>
-                <button className="download-btn" onClick={() => downloadChecklist('arrival')}>
-                  <FaDownload /> Download Arrival Checklist
-                </button>
               </div>
             </div>
 
@@ -752,9 +713,12 @@ function App() {
             </h3>
             <div className="card-content">
               <ol className="step-list">
-                <li>Empty and clean all waste tanks (black tank may read 3/4 full but be empty)</li>
-                <li>Clean interior thoroughly</li>
+                <li>Wash used dishes</li>
+                <li>Pile used towels in the shower</li>
+                <li>Strip used bedding and leave it on the queen bed</li>
                 <li>Remove all personal belongings</li>
+                <li>Clean interior and fridge</li>
+                <li>Empty and clean all waste tanks (black tank may read 3/4 full but be empty)</li>
                 <li>Turn off all appliances and lights, including the water pump</li>
                 <li>Close all windows and vents</li>
                 <li>Secure all loose items and collapse the table</li>
@@ -764,9 +728,6 @@ function App() {
               <div className="tip">
                 <strong>Tip:</strong> Take photos of the clean interior for your records.
               </div>
-              <button className="download-btn" onClick={() => downloadChecklist('departure')}>
-                <FaDownload /> Download Drop-off Checklist
-              </button>
             </div>
           </div>
         </div>
