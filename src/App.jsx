@@ -18,24 +18,26 @@ import {
   FaBars,
   FaTimes,
   FaSuitcase,
-  FaDownload
+  FaDownload,
+  FaSun,
+  FaMoon
 } from 'react-icons/fa';
 import './App.css';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [theme, setTheme] = useState('system');
 
   const navItems = useMemo(() => [
     { id: 'rv-overview', label: 'RV Overview', icon: <FaHome /> },
     { id: 'what-to-bring', label: 'What to Bring', icon: <FaSuitcase /> },
-    { id: 'quick-start', label: 'Quick Start', icon: <FaHome /> },
+    { id: 'quick-start', label: 'Pick-up', icon: <FaHome /> },
     { id: 'power-systems', label: 'Power Systems', icon: <FaBatteryFull /> },
     { id: 'water-waste-systems', label: 'Water & Waste', icon: <FaWater /> },
     { id: 'climate-control', label: 'Climate Control', icon: <FaThermometerHalf /> },
     { id: 'kitchen-living', label: 'Kitchen & Living', icon: <FaUtensils /> },
-    { id: 'maintenance', label: 'Maintenance', icon: <FaTools /> },
-    { id: 'departure', label: 'Departure', icon: <FaCheckCircle /> },
+    { id: 'departure', label: 'Drop-off', icon: <FaCheckCircle /> },
     { id: 'faq', label: 'FAQ', icon: <FaExclamationTriangle /> }
   ], []);
 
@@ -69,22 +71,8 @@ function App() {
         4. Open propane tank valve
         5. Check all systems are functioning
       `,
-      maintenance: `
-        Daily Maintenance Checklist:
-        Morning:
-        - Check propane levels
-        - Monitor battery voltage
-        - Inspect for water leaks
-        - Test smoke and CO detectors
-        - Check tire pressure
-        Evening:
-        - Secure loose items
-        - Close windows and vents if needed
-        - Turn off unnecessary lights
-        - Check appliances are shut off
-      `,
       departure: `
-        Departure Checklist:
+        Drop-off Checklist:
         1. Empty and clean all waste tanks (black tank may read 3/4 full but be empty)
         2. Clean interior thoroughly
         3. Remove all personal belongings
@@ -125,6 +113,55 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [navItems]);
 
+  useEffect(() => {
+    // Check for saved theme preference or default to system
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    setTheme(savedTheme);
+    
+    // Apply theme
+    applyTheme(savedTheme);
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      if (theme === 'system') {
+        applyTheme('system');
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, [theme]);
+
+  const applyTheme = (selectedTheme) => {
+    const root = document.documentElement;
+    let actualTheme = selectedTheme;
+    
+    if (selectedTheme === 'system') {
+      actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    root.setAttribute('data-theme', actualTheme);
+  };
+
+  const toggleTheme = () => {
+    const themes = ['light', 'dark', 'system'];
+    const currentIndex = themes.indexOf(theme);
+    const nextTheme = themes[(currentIndex + 1) % themes.length];
+    
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    applyTheme(nextTheme);
+  };
+
+  const getThemeIcon = () => {
+    if (theme === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? <FaMoon /> : <FaSun />;
+    }
+    return theme === 'dark' ? <FaSun /> : <FaMoon />;
+  };
+
   return (
     <div className="App">
       <nav className="nav">
@@ -132,6 +169,17 @@ function App() {
           <div className="nav-brand">
             <FaHome />
             <span>Montana Adventure</span>
+          </div>
+          
+          <div className="nav-controls">
+            <button 
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark'} theme`}
+              title={`Current: ${theme} theme`}
+            >
+              {getThemeIcon()}
+            </button>
           </div>
           
           <ul className="nav-menu desktop-menu">
@@ -353,7 +401,7 @@ function App() {
 
       <section id="quick-start" className="section">
         <div className="container">
-          <h2 className="section-title">Quick Start Guide</h2>
+          <h2 className="section-title">Pick-up Guide</h2>
           <p className="section-subtitle">
             Essential information to get you started with your RV rental
           </p>
@@ -411,10 +459,10 @@ function App() {
               </h3>
               <div className="card-content">
                 <ol className="step-list">
-                  <li>Fill 40-gallon fresh water tank (if not connected to city water)</li>
+                  <li>The fresh water tank is already filled on pick up</li>
                   <li>Turn on water pump switch</li>
-                  <li>Open faucets to purge air from lines</li>
-                  <li>Check for leaks at all connections</li>
+                  <li>Open faucets to purge air from lines if needed</li>
+                  <li>The pump will turn off and on automatically to pressurize the lines</li>
                 </ol>
                 <div className="tip">
                   <strong>Tip:</strong> Always use potable water hoses and keep them clean.
@@ -691,73 +739,16 @@ function App() {
         </div>
       </section>
 
-      <section id="maintenance" className="section">
-        <div className="container">
-          <h2 className="section-title">Maintenance & Care</h2>
-          <p className="section-subtitle">
-            Daily maintenance tasks to keep your RV running smoothly
-          </p>
-
-          <div className="grid">
-            <div className="card">
-              <h3 className="card-title">
-                <FaTools /> Daily Maintenance
-              </h3>
-              <div className="card-content">
-                <h4>Morning Checks:</h4>
-                <ul>
-                  <li>Check propane levels</li>
-                  <li>Monitor battery voltage</li>
-                  <li>Inspect for water leaks</li>
-                  <li>Test smoke and CO detectors</li>
-                  <li>Check tire pressure</li>
-                </ul>
-                
-                <h4>Evening Tasks:</h4>
-                <ul>
-                  <li>Secure loose items</li>
-                  <li>Close windows and vents if needed</li>
-                  <li>Turn off unnecessary lights</li>
-                  <li>Check that appliances are properly shut off</li>
-                </ul>
-                <button className="download-btn" onClick={() => downloadChecklist('maintenance')}>
-                  <FaDownload /> Download Maintenance Checklist
-                </button>
-              </div>
-            </div>
-
-            <div className="card">
-              <h3 className="card-title">
-                <FaWater /> Water System Care
-              </h3>
-              <div className="card-content">
-                <h4>Regular Maintenance:</h4>
-                <ul>
-                  <li>Monitor tank levels daily</li>
-                  <li>Use biodegradable soaps and cleaners</li>
-                  <li>Keep water hoses clean and stored properly</li>
-                  <li>Check for leaks around connections</li>
-                </ul>
-                
-                <div className="tip">
-                  <strong>Tip:</strong> Regular maintenance prevents costly repairs and ensures a comfortable stay.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section id="departure" className="section">
         <div className="container">
-          <h2 className="section-title">Departure Checklist</h2>
+          <h2 className="section-title">Drop-off Checklist</h2>
           <p className="section-subtitle">
             Essential steps to take before returning the RV
           </p>
 
           <div className="card">
             <h3 className="card-title">
-              <FaCheckCircle /> Pre-Departure Tasks
+              <FaCheckCircle /> Pre-Drop-off Tasks
             </h3>
             <div className="card-content">
               <ol className="step-list">
@@ -774,7 +765,7 @@ function App() {
                 <strong>Tip:</strong> Take photos of the clean interior for your records.
               </div>
               <button className="download-btn" onClick={() => downloadChecklist('departure')}>
-                <FaDownload /> Download Departure Checklist
+                <FaDownload /> Download Drop-off Checklist
               </button>
             </div>
           </div>
@@ -798,9 +789,8 @@ function App() {
                 <ul>
                   <li><strong>No Power:</strong> Check battery connections and fuses</li>
                   <li><strong>No Water:</strong> Check pump switch and tank levels</li>
-                  <li><strong>Furnace Won't Start:</strong> Check shore power connection and thermostat</li>
-                  <li><strong>Refrigerator Not Cooling:</strong> Check power source and ventilation</li>
-                  <li><strong>Leaks:</strong> Tighten connections and check seals</li>
+                  <li><strong>Furnace Won't Start:</strong> Check shore power connection and battery in the remote control</li>
+                  <li><strong>Refrigerator Not Cooling:</strong> Check Battery Level and control knob in the fridge</li>
                   <li><strong>Generator/AC Issues:</strong> Check fuses and cables; contact owner for complex issues</li>
                 </ul>
               </div>
@@ -850,7 +840,7 @@ function App() {
                 <p>Immediately turn off all propane appliances, open windows, and check for leaks. Contact owner if problem persists.</p>
                 
                 <h4>Electrical Issues:</h4>
-                <p>Locate the electrical panel and reset any tripped breakers. Don't overload circuits.</p>
+                <p>Locate the electrical panel below the bottom bunk and reset any tripped breakers. Don't overload circuits.</p>
                 
                 <h4>Water Leaks:</h4>
                 <p>Turn off water pump immediately, locate source, and contact owner for assistance.</p>
