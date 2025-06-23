@@ -17,7 +17,8 @@ import {
   FaSnowflake,
   FaBars,
   FaTimes,
-  FaSuitcase
+  FaSuitcase,
+  FaDownload
 } from 'react-icons/fa';
 import './App.css';
 
@@ -26,6 +27,7 @@ function App() {
   const [activeSection, setActiveSection] = useState('');
 
   const navItems = useMemo(() => [
+    { id: 'rv-overview', label: 'RV Overview', icon: <FaHome /> },
     { id: 'what-to-bring', label: 'What to Bring', icon: <FaSuitcase /> },
     { id: 'quick-start', label: 'Quick Start', icon: <FaHome /> },
     { id: 'power-systems', label: 'Power Systems', icon: <FaBatteryFull /> },
@@ -40,11 +42,8 @@ function App() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      // Get the navigation height
       const nav = document.querySelector('.nav');
       const navHeight = nav ? nav.offsetHeight : 0;
-      
-      // Calculate the exact position to scroll to
       const elementTop = element.offsetTop;
       const scrollPosition = elementTop - navHeight;
       
@@ -56,12 +55,62 @@ function App() {
     setIsMenuOpen(false);
   };
 
+  const downloadPDF = () => {
+    window.print();
+  };
+
+  const downloadChecklist = (type) => {
+    const checklists = {
+      arrival: `
+        Arrival Checklist:
+        1. Park on level ground and engage parking brake
+        2. Chock the wheels for safety
+        3. Connect to 30amp power source (if available)
+        4. Open propane tank valve
+        5. Check all systems are functioning
+      `,
+      maintenance: `
+        Daily Maintenance Checklist:
+        Morning:
+        - Check propane levels
+        - Monitor battery voltage
+        - Inspect for water leaks
+        - Test smoke and CO detectors
+        - Check tire pressure
+        Evening:
+        - Secure loose items
+        - Close windows and vents if needed
+        - Turn off unnecessary lights
+        - Check appliances are shut off
+      `,
+      departure: `
+        Departure Checklist:
+        1. Empty and clean all waste tanks (black tank may read 3/4 full but be empty)
+        2. Clean interior thoroughly
+        3. Remove all personal belongings
+        4. Turn off all appliances and lights, including water pump
+        5. Close all windows and vents
+        6. Secure all loose items and collapse the table
+        7. Return to original parking location (if applicable)
+        8. Complete final inspection
+      `
+    };
+    
+    const blob = new Blob([checklists[type]], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${type}-checklist.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const sections = navItems.map(item => item.id);
       const nav = document.querySelector('.nav');
       const navHeight = nav ? nav.offsetHeight : 0;
-      const scrollPosition = window.scrollY + navHeight + 50; // Add some buffer
+      const scrollPosition = window.scrollY + navHeight + 50;
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = document.getElementById(sections[i]);
@@ -78,15 +127,13 @@ function App() {
 
   return (
     <div className="App">
-      {/* Navigation */}
       <nav className="nav">
         <div className="container nav-container">
           <div className="nav-brand">
             <FaHome />
-            <span>RV Instructions</span>
+            <span>Montana Adventure</span>
           </div>
           
-          {/* Desktop Menu */}
           <ul className="nav-menu desktop-menu">
             {navItems.map((item) => (
               <li key={item.id}>
@@ -101,7 +148,6 @@ function App() {
             ))}
           </ul>
 
-          {/* Mobile Menu Button */}
           <button 
             className="mobile-menu-btn"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -111,7 +157,6 @@ function App() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
           <ul className="mobile-nav-menu">
             {navItems.map((item) => (
@@ -129,15 +174,47 @@ function App() {
         </div>
       </nav>
 
-      {/* Header */}
       <header className="header">
         <div className="container">
           <h1>Montana Adventure</h1>
-          <p>RV Rental Instructions: guide for using, cleaning, and troubleshooting your trailer</p>
+          <p>RV Rental Instructions: guide for using, cleaning, and troubleshooting your Coleman 17b trailer</p>
+          <button className="download-btn" onClick={downloadPDF}>
+            <FaDownload /> Download/Print Guide
+          </button>
         </div>
       </header>
 
-      {/* What to Bring */}
+      <section id="rv-overview" className="section">
+        <div className="container">
+          <h2 className="section-title">RV Overview</h2>
+          <p className="section-subtitle">Key details about your Coleman 17b trailer</p>
+          <div className="grid">
+            <div className="card">
+              <h3 className="card-title">Specifications</h3>
+              <div className="card-content">
+                <ul>
+                  <li><strong>Model:</strong> Coleman 17b</li>
+                  <li><strong>Length:</strong> ~22 feet</li>
+                  <li><strong>Weight:</strong> 3500 lbs</li>
+                  <li><strong>Towing:</strong> Requires 2 5/16" ball</li>
+                  <li><strong>Power:</strong> 30amp plug</li>
+                </ul>
+              </div>
+            </div>
+            <div className="card">
+              <h3 className="card-title">Sleeping Arrangements</h3>
+              <div className="card-content">
+                <ul>
+                  <li>2 single bunk beds</li>
+                  <li>1 dinette conversion bed</li>
+                  <li>1 queen bed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="what-to-bring" className="section">
         <div className="container">
           <h2 className="section-title">What to Bring</h2>
@@ -274,7 +351,6 @@ function App() {
         </div>
       </section>
 
-      {/* Quick Start Guide */}
       <section id="quick-start" className="section">
         <div className="container">
           <h2 className="section-title">Quick Start Guide</h2>
@@ -291,10 +367,13 @@ function App() {
                 <ol className="step-list">
                   <li>Park on level ground and engage parking brake</li>
                   <li>Chock the wheels for safety</li>
-                  <li>Connect to power source (if available)</li>
+                  <li>Connect to 30amp power source (if available)</li>
                   <li>Open propane tank valve</li>
                   <li>Check all systems are functioning</li>
                 </ol>
+                <button className="download-btn" onClick={() => downloadChecklist('arrival')}>
+                  <FaDownload /> Download Arrival Checklist
+                </button>
               </div>
             </div>
 
@@ -318,12 +397,11 @@ function App() {
         </div>
       </section>
 
-      {/* Water & Waste Systems */}
       <section id="water-waste-systems" className="section">
         <div className="container">
           <h2 className="section-title">Water & Waste Systems</h2>
           <p className="section-subtitle">
-            How to use and maintain the fresh water, gray water, and black water systems
+            How to use and maintain the fresh water (40 gal), gray water (20 gal), and black water (20 gal) systems
           </p>
 
           <div className="grid">
@@ -333,7 +411,7 @@ function App() {
               </h3>
               <div className="card-content">
                 <ol className="step-list">
-                  <li>Fill fresh water tank (if not connected to city water)</li>
+                  <li>Fill 40-gallon fresh water tank (if not connected to city water)</li>
                   <li>Turn on water pump switch</li>
                   <li>Open faucets to purge air from lines</li>
                   <li>Check for leaks at all connections</li>
@@ -349,7 +427,7 @@ function App() {
                 <FaShower /> Shower & Sink Usage
               </h3>
               <div className="card-content">
-                <p>Use water sparingly - tanks have limited capacity.</p>
+                <p>Use water sparingly - 40-gallon fresh tank has limited capacity.</p>
                 <ul>
                   <li>Turn off water while soaping up</li>
                   <li>Use biodegradable soaps</li>
@@ -364,7 +442,7 @@ function App() {
               </h3>
               <div className="card-content">
                 <ol className="step-list">
-                  <li>Monitor gray water tank level</li>
+                  <li>Monitor 20-gallon gray water tank level</li>
                   <li>Use biodegradable soaps and cleaners</li>
                   <li>Dump at designated dump stations only</li>
                   <li>Rinse tank after dumping</li>
@@ -382,8 +460,8 @@ function App() {
               <div className="card-content">
                 <ol className="step-list">
                   <li>Use RV-specific toilet paper only</li>
-                  <li>Add appropriate chemicals to tank</li>
-                  <li>Monitor tank level indicator</li>
+                  <li>Add appropriate chemicals to 20-gallon tank</li>
+                  <li>Monitor tank level indicator (may read 3/4 full when empty)</li>
                   <li>Dump at designated stations only</li>
                   <li>Thoroughly rinse after dumping</li>
                 </ol>
@@ -402,7 +480,6 @@ function App() {
         </div>
       </section>
 
-      {/* Power Systems */}
       <section id="power-systems" className="section">
         <div className="container">
           <h2 className="section-title">Power Systems</h2>
@@ -418,7 +495,7 @@ function App() {
               <div className="card-content">
                 <h4>System Overview:</h4>
                 <ul>
-                  <li><strong>3800Wh Lithium Battery:</strong> Powers essential systems for ~3 days without charging</li>
+                  <li><strong>3800Wh Lithium Battery:</strong> Powers all battery-operated systems simultaneously for ~3 days without charging</li>
                   <li><strong>200W Solar Panel:</strong> Provides continuous charging in sunlight</li>
                   <li><strong>Indefinite Operation:</strong> Fridge and lights can run continuously with solar charging</li>
                 </ul>
@@ -443,7 +520,7 @@ function App() {
                 <FaLightbulb /> Shore Power Requirements
               </h3>
               <div className="card-content">
-                <h4>Appliances that require shore power (plugged in):</h4>
+                <h4>Appliances that require 30amp shore power:</h4>
                 <ul>
                   <li>Microwave</li>
                   <li>Electric heater</li>
@@ -487,7 +564,6 @@ function App() {
         </div>
       </section>
 
-      {/* Climate Control */}
       <section id="climate-control" className="section">
         <div className="container">
           <h2 className="section-title">Climate Control</h2>
@@ -502,30 +578,15 @@ function App() {
               </h3>
               <div className="card-content">
                 <ol className="step-list">
-                  <li>Ensure propane tank has sufficient fuel</li>
-                  <li>Turn on furnace switch</li>
-                  <li>Set thermostat to desired temperature</li>
-                  <li>Check that vents are open and unobstructed</li>
+                  <li>Ensure you're connected to 30amp shore power</li>
+                  <li>Locate the remote control velcroed under the AC unit</li>
+                  <li>Use the remote to turn on the electric furnace</li>
+                  <li>Set thermostat to desired temperature using the remote</li>
+
                 </ol>
-                <div className="tip">
-                  <strong>Tip:</strong> Use ceiling vents for better heat distribution.
-                </div>
               </div>
             </div>
 
-            <div className="card">
-              <h3 className="card-title">
-                <FaFan /> Ventilation
-              </h3>
-              <div className="card-content">
-                <ul>
-                  <li>Open roof vents for air circulation</li>
-                  <li>Use ceiling fan to distribute air</li>
-                  <li>Open windows when weather permits</li>
-                  <li>Close vents when using AC or heat</li>
-                </ul>
-              </div>
-            </div>
 
             <div className="card">
               <h3 className="card-title">
@@ -533,7 +594,7 @@ function App() {
               </h3>
               <div className="card-content">
                 <ol className="step-list">
-                  <li>Ensure you're connected to shore power</li>
+                  <li>Ensure you're connected to 30amp shore power</li>
                   <li>Turn on AC unit</li>
                   <li>Set temperature and fan speed</li>
                   <li>Close all windows and vents</li>
@@ -569,7 +630,6 @@ function App() {
         </div>
       </section>
 
-      {/* Kitchen & Living Areas */}
       <section id="kitchen-living" className="section">
         <div className="container">
           <h2 className="section-title">Kitchen & Living Areas</h2>
@@ -631,7 +691,6 @@ function App() {
         </div>
       </section>
 
-      {/* Maintenance & Troubleshooting */}
       <section id="maintenance" className="section">
         <div className="container">
           <h2 className="section-title">Maintenance & Care</h2>
@@ -661,6 +720,9 @@ function App() {
                   <li>Turn off unnecessary lights</li>
                   <li>Check that appliances are properly shut off</li>
                 </ul>
+                <button className="download-btn" onClick={() => downloadChecklist('maintenance')}>
+                  <FaDownload /> Download Maintenance Checklist
+                </button>
               </div>
             </div>
 
@@ -675,7 +737,6 @@ function App() {
                   <li>Use biodegradable soaps and cleaners</li>
                   <li>Keep water hoses clean and stored properly</li>
                   <li>Check for leaks around connections</li>
-                  <li>Winterize if temperatures drop below freezing</li>
                 </ul>
                 
                 <div className="tip">
@@ -687,7 +748,6 @@ function App() {
         </div>
       </section>
 
-      {/* Departure Checklist */}
       <section id="departure" className="section">
         <div className="container">
           <h2 className="section-title">Departure Checklist</h2>
@@ -701,7 +761,7 @@ function App() {
             </h3>
             <div className="card-content">
               <ol className="step-list">
-                <li>Empty and clean all waste tanks (sometimes the black tank reads 3/4 full, but it's actually empty)</li>
+                <li>Empty and clean all waste tanks (black tank may read 3/4 full but be empty)</li>
                 <li>Clean interior thoroughly</li>
                 <li>Remove all personal belongings</li>
                 <li>Turn off all appliances and lights, including the water pump</li>
@@ -713,12 +773,14 @@ function App() {
               <div className="tip">
                 <strong>Tip:</strong> Take photos of the clean interior for your records.
               </div>
+              <button className="download-btn" onClick={() => downloadChecklist('departure')}>
+                <FaDownload /> Download Departure Checklist
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section id="faq" className="section">
         <div className="container">
           <h2 className="section-title">Frequently Asked Questions</h2>
@@ -736,9 +798,10 @@ function App() {
                 <ul>
                   <li><strong>No Power:</strong> Check battery connections and fuses</li>
                   <li><strong>No Water:</strong> Check pump switch and tank levels</li>
-                  <li><strong>Furnace Won't Start:</strong> Check propane and thermostat</li>
+                  <li><strong>Furnace Won't Start:</strong> Check shore power connection and thermostat</li>
                   <li><strong>Refrigerator Not Cooling:</strong> Check power source and ventilation</li>
                   <li><strong>Leaks:</strong> Tighten connections and check seals</li>
+                  <li><strong>Generator/AC Issues:</strong> Check fuses and cables; contact owner for complex issues</li>
                 </ul>
               </div>
             </div>
@@ -749,13 +812,13 @@ function App() {
               </h3>
               <div className="card-content">
                 <h4>Water Usage:</h4>
-                <p>Water typically lasts 2-3 days for 2 people with careful usage. Monitor tank levels and conserve water.</p>
+                <p>40-gallon fresh water tank typically lasts 2-3 days for 2 people with careful usage. Monitor tank levels and conserve water.</p>
                 
                 <h4>If You Run Out of Water:</h4>
                 <p>Locate the nearest potable water source or campground with water hookups. Never use non-potable water sources.</p>
                 
                 <h4>Tank Monitoring:</h4>
-                <p>Use tank level indicators on the control panel. Gray water fills faster than black water.</p>
+                <p>Use tank level indicators on the control panel. Gray water (20 gal) fills faster than black water (20 gal). Black tank may read 3/4 full when empty.</p>
               </div>
             </div>
 
@@ -765,7 +828,7 @@ function App() {
               </h3>
               <div className="card-content">
                 <h4>Heating Without Shore Power:</h4>
-                <p>Use the propane furnace. Ensure propane tank is full and thermostat is set correctly.</p>
+                <p>Use the portable propane heater. The main electric furnace requires shore power or generator power.</p>
                 
                 <h4>Quiet Heating at Night:</h4>
                 <p>Use the included portable propane heater for quiet operation in RV parks.</p>
@@ -794,20 +857,23 @@ function App() {
                 
                 <h4>Battery Issues:</h4>
                 <p>Check connections and voltage. If completely dead, contact owner for jump start assistance.</p>
+                
+                <h4>Roadside Assistance:</h4>
+                <p>Contact your own roadside assistance provider or local RV repair services. Owner does not provide roadside assistance.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="container">
-          <p>&copy; 2024 RV Rental Instructions - rv.arlint.dev</p>
+          <p>© 2025 RV Rental Instructions - rv.arlint.dev</p>
           <p>For emergencies or questions, contact the rental owner immediately.</p>
           <p><strong>Owner Contact:</strong></p>
           <p>Austin Arlint</p>
           <p>Phone: <a href="tel:4062186028">(406) 218-6028</a></p>
+          <p>Email: <a href="mailto:aarlint@gmail.com">aarlint@gmail.com</a></p>
           <p>Address: 12123 O'Keefe Creek Blvd, Missoula, MT 59808</p>
         </div>
       </footer>
@@ -815,4 +881,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
