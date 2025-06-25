@@ -141,6 +141,7 @@ function App() {
     { file: 'propane-tank.mov', title: 'Propane Tank' },
     { file: 'hitch-lift.mov', title: 'Hitch Lift' },
     { file: 'generator.MOV', title: 'Generator' },
+    { file: 'septic-system.mov', title: 'Septic System' },
   ];
   const [currentVideo, setCurrentVideo] = useState(0);
   const goToPrev = () => setCurrentVideo((prev) => (prev === 0 ? videoList.length - 1 : prev - 1));
