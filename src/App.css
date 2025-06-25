@@ -325,7 +325,7 @@
 }
 
 .header {
-  background: var(--header-bg);
+  background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6)), url('/background.webp') center center/cover no-repeat;
   color: white;
   padding: 8rem 0 6rem;
   text-align: center;

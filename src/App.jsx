@@ -20,7 +20,9 @@ import {
   FaSuitcase,
   FaDownload,
   FaSun,
-  FaMoon
+  FaMoon,
+  FaChevronLeft,
+  FaChevronRight
 } from 'react-icons/fa';
 import './App.css';
 
@@ -125,6 +127,53 @@ function App() {
   const getThemeIcon = () => {
     return theme === 'dark' ? <FaSun /> : <FaMoon />;
   };
+
+  const videoList = [
+    { file: 'shore-power.mov', title: 'Shore Power' },
+    { file: 'inverter.mov', title: 'Inverter' },
+    { file: 'solar.mov', title: 'Solar System' },
+    { file: 'portable-propane-heater.mov', title: 'Portable Propane Heater' },
+    { file: 'bathroom.mov', title: 'Bathroom' },
+    { file: 'breaker-box.mov', title: 'Breaker Box' },
+    { file: 'stovetop.mov', title: 'Stovetop' },
+    { file: 'shore-powered-appliances.mov', title: 'Shore Powered Appliances' },
+    { file: 'fridge.mov', title: 'Fridge' },
+    { file: 'propane-tank.mov', title: 'Propane Tank' },
+    { file: 'hitch-lift.mov', title: 'Hitch Lift' },
+    { file: 'generator.MOV', title: 'Generator' },
+  ];
+  const [currentVideo, setCurrentVideo] = useState(0);
+  const goToPrev = () => setCurrentVideo((prev) => (prev === 0 ? videoList.length - 1 : prev - 1));
+  const goToNext = () => setCurrentVideo((prev) => (prev === videoList.length - 1 ? 0 : prev + 1));
+
+  // Swipe support
+  const videoRef = React.useRef(null);
+  const touchStartX = React.useRef(null);
+  const touchEndX = React.useRef(null);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0].screenX;
+  };
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].screenX;
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (diff > 50) goToNext(); // swipe left
+      if (diff < -50) goToPrev(); // swipe right
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
+  React.useEffect(() => {
+    if (videoRef.current) {
+      // Try to play the video when currentVideo changes
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {}); // Ignore autoplay errors
+      }
+    }
+  }, [currentVideo]);
 
   return (
     <div className="App">
@@ -813,6 +862,91 @@ function App() {
                 <p>Contact your own roadside assistance provider or local RV repair services. Owner does not provide roadside assistance.</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Tutorials Section */}
+      <section id="video-tutorials" className="section">
+        <div className="container">
+          <h2 className="section-title">Video Tutorials</h2>
+          <p className="section-subtitle">Watch these short videos for step-by-step help with key RV systems and features.</p>
+          {/* Thumbnails Row */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            {videoList.map((vid, idx) => (
+              <div
+                key={vid.file}
+                onClick={() => setCurrentVideo(idx)}
+                style={{
+                  border: idx === currentVideo ? '2px solid var(--accent-color)' : '2px solid transparent',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  boxShadow: idx === currentVideo ? '0 0 8px var(--accent-color)' : 'none',
+                  overflow: 'hidden',
+                  width: 64,
+                  height: 40,
+                  background: '#222',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}
+                title={vid.title}
+              >
+                <video
+                  src={`/${vid.file}`}
+                  muted
+                  playsInline
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
+                  tabIndex={-1}
+                />
+                {idx === currentVideo && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(16,185,129,0.7)',
+                    color: 'white',
+                    fontSize: 10,
+                    textAlign: 'center',
+                    padding: '0 2px',
+                  }}>{vid.title}</div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
+            <button onClick={goToPrev} aria-label="Previous video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
+              <FaChevronLeft />
+            </button>
+            <div style={{ width: '100%', maxWidth: 500 }}>
+              <div className="card" style={{ margin: 0 }}>
+                <h3 className="card-title">{videoList[currentVideo].title}</h3>
+                <div className="card-content">
+                  <video
+                    key={videoList[currentVideo].file}
+                    ref={videoRef}
+                    controls
+                    width="100%"
+                    style={{ borderRadius: '12px' }}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    onEnded={goToNext}
+                  >
+                    <source src={`/${videoList[currentVideo].file}`} type="video/mp4" />
+                    <source src={`/${videoList[currentVideo].file}`} type="video/quicktime" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>
+                {currentVideo + 1} / {videoList.length}
+              </div>
+            </div>
+            <button onClick={goToNext} aria-label="Next video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
+              <FaChevronRight />
+            </button>
           </div>
         </div>
       </section>
