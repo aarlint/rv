@@ -35,12 +35,13 @@ function App() {
     { id: 'rv-overview', label: 'RV Overview', icon: <FaHome /> },
     { id: 'what-to-bring', label: 'What to Bring', icon: <FaSuitcase /> },
     { id: 'quick-start', label: 'Pick-up', icon: <FaHome /> },
-    { id: 'power-systems', label: 'Power Systems', icon: <FaBatteryFull /> },
     { id: 'water-waste-systems', label: 'Water & Waste', icon: <FaWater /> },
+    { id: 'power-systems', label: 'Power Systems', icon: <FaBatteryFull /> },
     { id: 'climate-control', label: 'Climate Control', icon: <FaThermometerHalf /> },
     { id: 'kitchen-living', label: 'Kitchen & Living', icon: <FaUtensils /> },
     { id: 'departure', label: 'Drop-off', icon: <FaCheckCircle /> },
-    { id: 'faq', label: 'FAQ', icon: <FaExclamationTriangle /> }
+    { id: 'faq', label: 'FAQ', icon: <FaExclamationTriangle /> },
+    { id: 'video-tutorials', label: 'Video Tutorials', icon: <FaPlay /> }
   ], []);
 
   const scrollToSection = (sectionId) => {
@@ -140,7 +141,7 @@ function App() {
     { file: 'fridge.mov', title: 'Fridge' },
     { file: 'propane-tank.mov', title: 'Propane Tank' },
     { file: 'hitch-lift.mov', title: 'Hitch Lift' },
-    { file: 'generator.MOV', title: 'Generator' },
+    { file: 'generator.mov', title: 'Generator' },
     { file: 'septic-system.mov', title: 'Septic System' },
   ];
   const [currentVideo, setCurrentVideo] = useState(0);
@@ -530,12 +531,6 @@ function App() {
               </div>
             </div>
           </div>
-
-          <div className="video-placeholder">
-            <FaPlay size={48} />
-            <h3>Water & Waste System Setup Video</h3>
-            <p>Complete guide to water system setup, usage, and proper waste tank dumping</p>
-          </div>
         </div>
       </section>
 
@@ -674,17 +669,15 @@ function App() {
                   <li>Backup option when generator can't be used</li>
                 </ul>
                 
+                <div className="warning">
+                  <strong>Important:</strong> Renters are responsible for providing their own propane camp bottles if they plan to use the portable propane heater. These are not included with the rental.
+                </div>
+                
                 <div className="tip">
                   <strong>Tip:</strong> Use the portable heater for quiet operation when the main furnace might disturb others.
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="video-placeholder">
-            <FaPlay size={48} />
-            <h3>Climate Control Operation Video</h3>
-            <p>Complete guide to operating heating and cooling systems</p>
           </div>
         </div>
       </section>
