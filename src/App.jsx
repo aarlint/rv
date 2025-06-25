@@ -22,7 +22,18 @@ import {
   FaSun,
   FaMoon,
   FaChevronLeft,
-  FaChevronRight
+  FaChevronRight,
+  FaPlug,
+  FaBolt,
+  FaSolarPanel,
+  FaFire,
+  FaToilet,
+  FaCog,
+  FaFireAlt,
+  FaSnowflake as FaFreezer,
+  FaGasPump,
+  FaTruck,
+  FaCogs
 } from 'react-icons/fa';
 import './App.css';
 
@@ -130,19 +141,19 @@ function App() {
   };
 
   const videoList = [
-    { file: 'shore-power.mov', title: 'Shore Power' },
-    { file: 'inverter.mov', title: 'Inverter' },
-    { file: 'solar.mov', title: 'Solar System' },
-    { file: 'portable-propane-heater.mov', title: 'Portable Propane Heater' },
-    { file: 'bathroom.mov', title: 'Bathroom' },
-    { file: 'breaker-box.mov', title: 'Breaker Box' },
-    { file: 'stovetop.mov', title: 'Stovetop' },
-    { file: 'shore-powered-appliances.mov', title: 'Shore Powered Appliances' },
-    { file: 'fridge.mov', title: 'Fridge' },
-    { file: 'propane-tank.mov', title: 'Propane Tank' },
-    { file: 'hitch-lift.mov', title: 'Hitch Lift' },
-    { file: 'generator.mov', title: 'Generator' },
-    { file: 'septic-system.mov', title: 'Septic System' },
+    { file: 'shore-power.mov', title: 'Shore Power', icon: <FaPlug /> },
+    { file: 'inverter.mov', title: 'Inverter', icon: <FaBolt /> },
+    { file: 'solar.mov', title: 'Solar System', icon: <FaSolarPanel /> },
+    { file: 'portable-propane-heater.mov', title: 'Portable Propane Heater', icon: <FaFire /> },
+    { file: 'bathroom.mov', title: 'Bathroom', icon: <FaToilet /> },
+    { file: 'breaker-box.mov', title: 'Breaker Box', icon: <FaCog /> },
+    { file: 'stovetop.mov', title: 'Stovetop', icon: <FaFireAlt /> },
+    { file: 'shore-powered-appliances.mov', title: 'Shore Powered Appliances', icon: <FaLightbulb /> },
+    { file: 'fridge.mov', title: 'Fridge', icon: <FaFreezer /> },
+    { file: 'propane-tank.mov', title: 'Propane Tank', icon: <FaGasPump /> },
+    { file: 'hitch-lift.mov', title: 'Hitch Lift', icon: <FaTruck /> },
+    { file: 'generator.mov', title: 'Generator', icon: <FaCogs /> },
+    { file: 'septic-system.mov', title: 'Septic System', icon: <FaTrash /> },
   ];
   const [currentVideo, setCurrentVideo] = useState(0);
   const goToPrev = () => setCurrentVideo((prev) => (prev === 0 ? videoList.length - 1 : prev - 1));
@@ -868,7 +879,7 @@ function App() {
           {/* Thumbnails Row */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
             {videoList.map((vid, idx) => (
-              <div
+              <button
                 key={vid.file}
                 onClick={() => setCurrentVideo(idx)}
                 style={{
@@ -876,38 +887,28 @@ function App() {
                   borderRadius: 8,
                   cursor: 'pointer',
                   boxShadow: idx === currentVideo ? '0 0 8px var(--accent-color)' : 'none',
-                  overflow: 'hidden',
-                  width: 64,
-                  height: 40,
-                  background: '#222',
+                  background: idx === currentVideo ? 'var(--accent-color)' : 'var(--card-bg)',
+                  color: idx === currentVideo ? 'white' : 'var(--text-primary)',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  position: 'relative',
+                  padding: '0.5rem',
+                  minWidth: 80,
+                  height: 60,
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  transition: 'all 0.2s ease',
                 }}
                 title={vid.title}
               >
-                <video
-                  src={`/${vid.file}`}
-                  muted
-                  playsInline
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
-                  tabIndex={-1}
-                />
-                {idx === currentVideo && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'rgba(16,185,129,0.7)',
-                    color: 'white',
-                    fontSize: 10,
-                    textAlign: 'center',
-                    padding: '0 2px',
-                  }}>{vid.title}</div>
-                )}
-              </div>
+                <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>
+                  {vid.icon}
+                </div>
+                <div style={{ textAlign: 'center', lineHeight: '1' }}>
+                  {vid.title}
+                </div>
+              </button>
             ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
