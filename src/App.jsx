@@ -45,6 +45,7 @@ function App() {
 
   const navItems = useMemo(() => [
     { id: 'rv-overview', label: 'RV Overview', icon: <FaHome /> },
+    { id: 'video-tutorials', label: 'Video Tutorials', icon: <FaPlay /> },
     { id: 'what-to-bring', label: 'What to Bring', icon: <FaSuitcase /> },
     { id: 'quick-start', label: 'Pick-up', icon: <FaHome /> },
     { id: 'water-waste-systems', label: 'Water & Waste', icon: <FaWater /> },
@@ -52,8 +53,7 @@ function App() {
     { id: 'climate-control', label: 'Climate Control', icon: <FaThermometerHalf /> },
     { id: 'kitchen-living', label: 'Kitchen & Living', icon: <FaUtensils /> },
     { id: 'departure', label: 'Drop-off', icon: <FaCheckCircle /> },
-    { id: 'faq', label: 'FAQ', icon: <FaExclamationTriangle /> },
-    { id: 'video-tutorials', label: 'Video Tutorials', icon: <FaPlay /> }
+    { id: 'faq', label: 'FAQ', icon: <FaExclamationTriangle /> }
   ], []);
 
   const scrollToSection = (sectionId) => {
@@ -143,7 +143,8 @@ function App() {
 
   const videoList = [
     { file: 'overview-outside.mov', title: 'Overview Outside', icon: <FaHome /> },
-    { file: 'overview-inside.mov', title: 'Overview Inside', icon: <FaBed /> },
+    { file: 'overview-inside-1.mov', title: 'Overview Inside 1', icon: <FaBed /> },
+    { file: 'overview-inside-2.mov', title: 'Overview Inside 2', icon: <FaUtensils /> },
     { file: 'control-panel.mov', title: 'Control Panel', icon: <FaCog /> },
     { file: 'starlink.mov', title: 'Starlink', icon: <FaWifi /> },
     { file: 'shore-power.mov', title: 'Shore Power', icon: <FaPlug /> },
@@ -257,9 +258,6 @@ function App() {
         <div className="container">
           <h1>Montana Adventure</h1>
           <p>RV Rental Instructions: guide for using, cleaning, and troubleshooting your Coleman 17b trailer</p>
-          <button className="download-btn" onClick={downloadPDF}>
-            <FaDownload /> Download/Print Guide
-          </button>
         </div>
       </header>
 
@@ -290,6 +288,81 @@ function App() {
                 </ul>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Tutorials Section */}
+      <section id="video-tutorials" className="section">
+        <div className="container">
+          <h2 className="section-title">Video Tutorials</h2>
+          <p className="section-subtitle">Watch these short videos for step-by-step help with key RV systems and features.</p>
+          {/* Thumbnails Row */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            {videoList.map((vid, idx) => (
+              <button
+                key={vid.file}
+                onClick={() => setCurrentVideo(idx)}
+                style={{
+                  border: idx === currentVideo ? '2px solid var(--accent-color)' : '2px solid transparent',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  boxShadow: idx === currentVideo ? '0 0 8px var(--accent-color)' : 'none',
+                  background: idx === currentVideo ? 'var(--accent-color)' : 'var(--card-bg)',
+                  color: idx === currentVideo ? 'white' : 'var(--text-primary)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.5rem',
+                  minWidth: 80,
+                  height: 60,
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  transition: 'all 0.2s ease',
+                }}
+                title={vid.title}
+              >
+                <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>
+                  {vid.icon}
+                </div>
+                <div style={{ textAlign: 'center', lineHeight: '1' }}>
+                  {vid.title}
+                </div>
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
+            <button onClick={goToPrev} aria-label="Previous video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
+              <FaChevronLeft />
+            </button>
+            <div style={{ width: '100%', maxWidth: 500 }}>
+              <div className="card" style={{ margin: 0 }}>
+                <h3 className="card-title">{videoList[currentVideo].title}</h3>
+                <div className="card-content">
+                  <video
+                    key={videoList[currentVideo].file}
+                    ref={videoRef}
+                    controls
+                    width="100%"
+                    style={{ borderRadius: '12px' }}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    onEnded={goToNext}
+                  >
+                    <source src={`/${videoList[currentVideo].file}`} type="video/mp4" />
+                    <source src={`/${videoList[currentVideo].file}`} type="video/quicktime" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>
+                {currentVideo + 1} / {videoList.length}
+              </div>
+            </div>
+            <button onClick={goToNext} aria-label="Next video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
+              <FaChevronRight />
+            </button>
           </div>
         </div>
       </section>
@@ -872,81 +945,6 @@ function App() {
                 <p>Contact your own roadside assistance provider or local RV repair services. Owner does not provide roadside assistance.</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Video Tutorials Section */}
-      <section id="video-tutorials" className="section">
-        <div className="container">
-          <h2 className="section-title">Video Tutorials</h2>
-          <p className="section-subtitle">Watch these short videos for step-by-step help with key RV systems and features.</p>
-          {/* Thumbnails Row */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-            {videoList.map((vid, idx) => (
-              <button
-                key={vid.file}
-                onClick={() => setCurrentVideo(idx)}
-                style={{
-                  border: idx === currentVideo ? '2px solid var(--accent-color)' : '2px solid transparent',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  boxShadow: idx === currentVideo ? '0 0 8px var(--accent-color)' : 'none',
-                  background: idx === currentVideo ? 'var(--accent-color)' : 'var(--card-bg)',
-                  color: idx === currentVideo ? 'white' : 'var(--text-primary)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0.5rem',
-                  minWidth: 80,
-                  height: 60,
-                  fontSize: '0.75rem',
-                  fontWeight: 'bold',
-                  transition: 'all 0.2s ease',
-                }}
-                title={vid.title}
-              >
-                <div style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }}>
-                  {vid.icon}
-                </div>
-                <div style={{ textAlign: 'center', lineHeight: '1' }}>
-                  {vid.title}
-                </div>
-              </button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', marginTop: '2rem' }}>
-            <button onClick={goToPrev} aria-label="Previous video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
-              <FaChevronLeft />
-            </button>
-            <div style={{ width: '100%', maxWidth: 500 }}>
-              <div className="card" style={{ margin: 0 }}>
-                <h3 className="card-title">{videoList[currentVideo].title}</h3>
-                <div className="card-content">
-                  <video
-                    key={videoList[currentVideo].file}
-                    ref={videoRef}
-                    controls
-                    width="100%"
-                    style={{ borderRadius: '12px' }}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={handleTouchEnd}
-                    onEnded={goToNext}
-                  >
-                    <source src={`/${videoList[currentVideo].file}`} type="video/mp4" />
-                    <source src={`/${videoList[currentVideo].file}`} type="video/quicktime" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              </div>
-              <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)' }}>
-                {currentVideo + 1} / {videoList.length}
-              </div>
-            </div>
-            <button onClick={goToNext} aria-label="Next video" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '2rem', color: 'var(--accent-color)' }}>
-              <FaChevronRight />
-            </button>
           </div>
         </div>
       </section>
