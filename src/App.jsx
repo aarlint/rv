@@ -33,7 +33,8 @@ import {
   FaSnowflake as FaFreezer,
   FaGasPump,
   FaTruck,
-  FaCogs
+  FaCogs,
+  FaWifi
 } from 'react-icons/fa';
 import './App.css';
 
@@ -141,6 +142,10 @@ function App() {
   };
 
   const videoList = [
+    { file: 'overview-outside.mov', title: 'Overview Outside', icon: <FaHome /> },
+    { file: 'overview-inside.mov', title: 'Overview Inside', icon: <FaBed /> },
+    { file: 'control-panel.mov', title: 'Control Panel', icon: <FaCog /> },
+    { file: 'starlink.mov', title: 'Starlink', icon: <FaWifi /> },
     { file: 'shore-power.mov', title: 'Shore Power', icon: <FaPlug /> },
     { file: 'inverter.mov', title: 'Inverter', icon: <FaBolt /> },
     { file: 'solar.mov', title: 'Solar System', icon: <FaSolarPanel /> },
